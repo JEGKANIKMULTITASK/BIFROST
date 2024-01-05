@@ -1,0 +1,10 @@
+*.dat
+*.out
+*.sim
+*.DS_store
+*.stdout
+*.c
+*stderr
+
+Cluster*
+*test*
