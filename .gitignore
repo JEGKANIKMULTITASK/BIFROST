@@ -6,9 +6,11 @@
 *.stdout
 *.c
 *.stderr
-*.png
+*.out.dSYM
 
 # Folder ques that should not be uploaded to github
 Cluster*
 *test*
-*Ef_resolution*
+*Ef_res*
+Bifrost*/
+#!**/*Bifrost*

@@ -1629,7 +1629,7 @@ AT (0, 0, 0) RELATIVE Sample_pos
 ROTATED (0, A4, 0) RELATIVE Sample_pos
 
 
-COMPONENT incoherent_sample = Incoherent(
+/*COMPONENT incoherent_sample = Incoherent(
     xwidth=0.005, 
     yheight=0.005, 
     zdepth=0.005, 
@@ -1640,20 +1640,31 @@ COMPONENT incoherent_sample = Incoherent(
     deltaE=0.0001,
     order=1)
 AT (0, 0, 0) RELATIVE Sample_arm
-ROTATED (0, 0, 0) RELATIVE Sample_arm
+ROTATED (0, 0, 0) RELATIVE Sample_arm*/
 
 COMPONENT Div2d_sample_B = Divergence_monitor(
     nh = 200, nv = 200, filename = "Div2d_sample_B", xwidth = sampleSizeX,
     yheight = sampleSizeY, maxdiv_h = 0.750000, maxdiv_v = 0.750000,restore_neutron=1)
-  AT (0, 0,0.580000+sample_radius*2+u) RELATIVE EndOfelement_1
-  /*EXTEND
+  AT (0, 0,0) RELATIVE Sample_pos
+ /* EXTEND
     %{
     x_div = RAD2DEG*atan2(vx,vz);
     y_div = RAD2DEG*atan2(vy,vz);
     if (SCATTERED) flag=1; else flag=0;
     %}*/
 
-/*COMPONENT Div2d_sample = Divergence_monitor(
+
+COMPONENT DivX_sample_monitor = DivPos_monitor(
+    nb=300,
+    ndiv = 300,
+    filename="DivX_monitor", 
+    xwidth=0.03, 
+    yheight=0.03, 
+    maxdiv=1.5, 
+    restore_neutron=1)
+AT (0, 0, u) RELATIVE PREVIOUS
+
+COMPONENT Div2d_sample = Divergence_monitor(
     nh = 100, nv = 100, filename = "Div2d_sample", xwidth = sampleSizeX, restore_neutron=1,
     yheight = sampleSizeY, maxdiv_h = 2.250000, maxdiv_v = 2.250000)
   AT (0, 0,u) RELATIVE PREVIOUS
@@ -1666,7 +1677,7 @@ COMPONENT PSD_sample_large = PSD_monitor(
 COMPONENT PSD_sample_small = PSD_monitor(
     nx = 20, ny = 20, filename = "PSD_sample_small", restore_neutron=1,
     xwidth = sampleSizeX, yheight = sampleSizeY)
-  AT (0, 0,u) RELATIVE PREVIOUS*/
+  AT (0, 0,u) RELATIVE PREVIOUS
 
 
   
