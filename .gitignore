@@ -9,6 +9,7 @@
 *.out.dSYM
 
 # Folder ques that should not be uploaded to github
+backend_mockup*
 Cluster*
 *test*
 *Ef_res*
