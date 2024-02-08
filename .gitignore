@@ -8,10 +8,12 @@
 *.stderr
 *.out.dSYM
 
+
 # Folder ques that should not be uploaded to github
-backend_mockup*
+backend_mockup_*
 Cluster*
 *test*
 *Ef_res*
 Bifrost*/
+*.mcpl
 #!**/*Bifrost*
