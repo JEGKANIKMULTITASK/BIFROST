@@ -1580,7 +1580,7 @@ AT (0,0, 7*u+length1+DivSlit0Gap/2.0) RELATIVE EndOfelement_2
 
 
 COMPONENT mcpl_output = MCPL_output(
-    filename="HighFlux_LowLamBand") 
+    filename="HighFlux_OptimalLamBand") 
 AT (0, 0, u) RELATIVE PREVIOUS
 
 

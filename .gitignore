@@ -16,4 +16,5 @@ Cluster*
 *Ef_res*
 Bifrost*/
 *.mcpl
+MCPL_*
 #!**/*Bifrost*
