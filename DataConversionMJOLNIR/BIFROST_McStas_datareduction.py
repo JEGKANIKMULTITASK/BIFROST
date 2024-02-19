@@ -2,6 +2,23 @@ import numpy as np
 import h5py
 import pandas as pd
 
+
+back_info = pd.read_csv('../BIFROST_Design_Article/Energy_resolution/BIFROST_McStas_backend_information.csv')
+#back_info = back_info.loc[back_info['wedge_number'] == 1]
+
+back_info = np.asarray(back_info)[:,0:5]
+
+for j in range(len(back_info)):
+    back_info[j,3] = back_info[j,3].replace(',','.')
+    back_info[j,4] = back_info[j,3].replace(',','.')
+
+back_info = np.asarray(back_info, dtype=float)    
+    
+back_info = back_info[(back_info[:,0]== 2.7)  & (back_info[:,2]== 4) | (back_info[:,0]== 3.2) & (back_info[:,2]== 4)| (back_info[:,0]== 3.8) & (back_info[:,2]== 5) | (back_info[:,0]== 4.4) & (back_info[:,2]== 5) | (back_info[:,0]== 5.0) & (back_info[:,2]== 5)]
+
+
+
+
 class tube_measurement:
     """
     This Object is designed to contain 1 tube mearsurment, in a given (A3, A4) setting,  including data and metadata needed for further reduction. To this object the following information can be assosiated:

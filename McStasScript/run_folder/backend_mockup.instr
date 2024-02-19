@@ -15,7 +15,7 @@
 * 
 * %Identification
 * Written by: Python McStas Instrument Generator
-* Date: 10:52:45 on February 15, 2024
+* Date: 09:40:53 on February 19, 2024
 * Origin: ESS DMSC
 * %INSTRUMENT_SITE: Generated_instruments
 * 
@@ -195,8 +195,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_0
 
 COMPONENT signal_tof_1Dspace_close1_4_0 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_1_4_0", yheight = 0.2988,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_0_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_1_4_0
 
@@ -214,8 +214,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_0
 
 COMPONENT signal_tof_1Dspace_mid_1_4_0 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_1_4_0", yheight = 0.2988,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_0_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_1_4_0
 
@@ -233,8 +233,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_0
 
 COMPONENT signal_tof_1Dspace_far_1_4_0 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_1_4_0", yheight = 0.2988,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_0_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_1_4_0
 
@@ -327,8 +327,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_1
 
 COMPONENT signal_tof_1Dspace_close2_4_1 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_2_4_1", yheight = 0.3048,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_1_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_2_4_1
 
@@ -346,8 +346,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_1
 
 COMPONENT signal_tof_1Dspace_mid_2_4_1 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_2_4_1", yheight = 0.3048,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_1_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_2_4_1
 
@@ -365,8 +365,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_1
 
 COMPONENT signal_tof_1Dspace_far_2_4_1 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_2_4_1", yheight = 0.3048,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_1_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_2_4_1
 
@@ -459,8 +459,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_2
 
 COMPONENT signal_tof_1Dspace_close3_4_2 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_3_4_2", yheight = 0.3119,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_2_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_3_4_2
 
@@ -478,8 +478,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_2
 
 COMPONENT signal_tof_1Dspace_mid_3_4_2 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_3_4_2", yheight = 0.3119,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_2_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_3_4_2
 
@@ -497,8 +497,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_2
 
 COMPONENT signal_tof_1Dspace_far_3_4_2 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_3_4_2", yheight = 0.3119,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_2_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_3_4_2
 
@@ -591,8 +591,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_3
 
 COMPONENT signal_tof_1Dspace_close1_4_3 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_1_4_3", yheight = 0.2988,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_3_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_1_4_3
 
@@ -610,8 +610,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_3
 
 COMPONENT signal_tof_1Dspace_mid_1_4_3 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_1_4_3", yheight = 0.2988,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_3_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_1_4_3
 
@@ -629,8 +629,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_3
 
 COMPONENT signal_tof_1Dspace_far_1_4_3 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_1_4_3", yheight = 0.2988,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_3_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_1_4_3
 
@@ -723,8 +723,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_4
 
 COMPONENT signal_tof_1Dspace_close2_4_4 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_2_4_4", yheight = 0.3048,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_4_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_2_4_4
 
@@ -742,8 +742,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_4
 
 COMPONENT signal_tof_1Dspace_mid_2_4_4 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_2_4_4", yheight = 0.3048,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_4_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_2_4_4
 
@@ -761,8 +761,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_4
 
 COMPONENT signal_tof_1Dspace_far_2_4_4 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_2_4_4", yheight = 0.3048,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_4_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_2_4_4
 
@@ -855,8 +855,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_5
 
 COMPONENT signal_tof_1Dspace_close3_4_5 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_3_4_5", yheight = 0.3119,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_5_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_3_4_5
 
@@ -874,8 +874,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_5
 
 COMPONENT signal_tof_1Dspace_mid_3_4_5 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_3_4_5", yheight = 0.3119,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_5_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_3_4_5
 
@@ -893,8 +893,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_5
 
 COMPONENT signal_tof_1Dspace_far_3_4_5 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_3_4_5", yheight = 0.3119,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_5_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_3_4_5
 
@@ -987,8 +987,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_6
 
 COMPONENT signal_tof_1Dspace_close1_4_6 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_1_4_6", yheight = 0.2988,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_6_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_1_4_6
 
@@ -1006,8 +1006,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_6
 
 COMPONENT signal_tof_1Dspace_mid_1_4_6 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_1_4_6", yheight = 0.2988,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_6_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_1_4_6
 
@@ -1025,8 +1025,8 @@ ROTATED (0,0,90) RELATIVE det_arm_1_4_6
 
 COMPONENT signal_tof_1Dspace_far_1_4_6 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_1_4_6", yheight = 0.2988,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_6_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_1_4_6
 
@@ -1119,8 +1119,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_7
 
 COMPONENT signal_tof_1Dspace_close2_4_7 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_2_4_7", yheight = 0.3048,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_7_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_2_4_7
 
@@ -1138,8 +1138,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_7
 
 COMPONENT signal_tof_1Dspace_mid_2_4_7 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_2_4_7", yheight = 0.3048,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_7_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_2_4_7
 
@@ -1157,8 +1157,8 @@ ROTATED (0,0,90) RELATIVE det_arm_2_4_7
 
 COMPONENT signal_tof_1Dspace_far_2_4_7 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_2_4_7", yheight = 0.3048,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_7_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_2_4_7
 
@@ -1251,8 +1251,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_8
 
 COMPONENT signal_tof_1Dspace_close3_4_8 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_close_He3_3_4_8", yheight = 0.3119,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_8_4_0.dat")
 AT (0,0,0) RELATIVE det_close_He3_3_4_8
 
@@ -1270,8 +1270,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_8
 
 COMPONENT signal_tof_1Dspace_mid_3_4_8 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_mid_He3_3_4_8", yheight = 0.3119,
- n = 100, time_min = 0,
- time_max = 0.25, time_bins = 100,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_8_4_1.dat")
 AT (0,0,0) RELATIVE det_mid_He3_3_4_8
 
@@ -1289,8 +1289,8 @@ ROTATED (0,0,90) RELATIVE det_arm_3_4_8
 
 COMPONENT signal_tof_1Dspace_far_3_4_8 = Union_abs_logger_1D_space_tof(
  target_geometry = "det_far_He3_3_4_8", yheight = 0.3119,
- n = 100, time_min = 0.002,
- time_max = 0.25, time_bins = 9200,
+ n = 100, time_min = 0.05,
+ time_max = 0.3, time_bins = 1250,
  filename = "signal_1Dspace_8_4_2.dat")
 AT (0,0,0) RELATIVE det_far_He3_3_4_8
 
