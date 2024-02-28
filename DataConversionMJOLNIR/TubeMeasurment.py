@@ -17,8 +17,6 @@ back_info = np.asarray(back_info, dtype=float)
 back_info = back_info[(back_info[:,0]== 2.7)  & (back_info[:,2]== 4) | (back_info[:,0]== 3.2) & (back_info[:,2]== 4)| (back_info[:,0]== 3.8) & (back_info[:,2]== 5) | (back_info[:,0]== 4.4) & (back_info[:,2]== 5) | (back_info[:,0]== 5.0) & (back_info[:,2]== 5)]
 
 
-
-
 class tube_measurement:
     """
     This Object is designed to contain 1 tube mearsurment, in a given (A3, A4) setting,  including data and metadata needed for further reduction. To this object the following information can be assosiated:
@@ -29,10 +27,7 @@ class tube_measurement:
     - I (y, t)
     - I _err (y,t)
 
-    Axis:
-    - t_s
-    - y_m
-    - A4
+    Axis: t_s, y_m, A4
 
     Metadata:
     - A3 (sample rotation)
@@ -123,7 +118,6 @@ class tube_measurement:
         # Get the angular offset from direct beam to first wedge
         with h5py.File(filename, 'r') as file:
             A4_offset = file['entry1/simulation/Param/A4'][()].astype('float')[0]
-            print('A4_offset = ', A4_offset)
             #A4_offset = A4_offset
 
         # Get the angular offset from wedge number
@@ -139,6 +133,15 @@ class tube_measurement:
         return self.A4, self.dA4
 
     def calcDE(self):
+        """
+        Calculates the energy transfer for each measured data-point I.
+        1) Determines the Ef_offset at for each detectorpixel along the tube.
+        2) Calculates Delta_E for each Ef (dA4), T. 
+        3) Returns Ef and Ei to have the same shape (len(t), len(y)) as Delta_E since it is needed for calculating Q.
+
+        return Delta_E, Ef, Ei in same shape as I.
+
+        """
         
         # Make correction to each physicals bins Ef (At this step self.Ef has shape (100,))
         ideal_lam = 1/(0.11056*np.sqrt(self.Ef))
@@ -181,8 +184,32 @@ class tube_measurement:
     
         # Calc qx and qy       
         qx = ki-kf*np.cos(np.radians(A4))
-        qy = kf*np.sin(np.radians(A4))
+        qy = -kf*np.sin(np.radians(A4))
 
         self.Q = np.stack((qx,qy))
 
         return self.Q
+
+    def flatten(self):
+        self.I = self.I.flatten()
+
+        self.I_err = self.I_err.flatten()
+
+        self.Delta_E = self.Delta_E.flatten()
+
+        qx = self.Q[0].flatten()
+        qy = self.Q[1].flatten()
+        self.Q = np.stack((qx,qy))
+        return self.I, self.I_err, self.Delta_E, self.Q
+
+    def CorrectI(self):
+        m_n = 1.67492749804e-27 # [kg]
+    
+        de_dt = (m_n*(162+self.L_sd)**2)/(self.t_s**3)*6.24150907e21 # convert from J to meV
+        
+        # Reshape A4 to have A4 for each matrix
+        de_dt = np.tile(de_dt, (len(self.I[:,0]),1))
+        
+        self.I = self.I/de_dt
+        
+        return self.I
