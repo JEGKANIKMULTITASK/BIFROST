@@ -100,18 +100,36 @@ class tube_measurement:
         - dA4: Angular offset from center of detectortube to each pixel. Same shpe as y_m
         - A4: Angular offset in scattering angle from direct beam to individual pixel.
         """
-        with h5py.File(filename, 'r') as file:
-            self.I = file['entry1/data/signal_1Dspace_'+str(self.wedge)+'_'+str(self.arc)+'_'+str(self.tube)+'_dat/data'][:].astype('float')
-            self.I_err = file['entry1/data/signal_1Dspace_'+str(self.wedge)+'_'+str(self.arc)+'_'+str(self.tube)+'_dat/errors'][:].astype('float')
-            self.t_s = file['entry1/data/signal_1Dspace_'+str(self.wedge)+'_'+str(self.arc)+'_'+str(self.tube)+'_dat/TOF__s_'][:]
-            self.y_m = file['entry1/data/signal_1Dspace_'+str(self.wedge)+'_'+str(self.arc)+'_'+str(self.tube)+'_dat/y__m_'][:]
-            self.A3 = file['entry1/simulation/Param/A3'][()].astype('float')[0]
-            A4_offset = file['entry1/simulation/Param/A4'][()].astype('float')[0]
+    
+        I = np.loadtxt(str(filename)+'/signal_1Dspace_'+str(self.wedge)+'_'+str(self.arc)+'_'+str(self.tube)+'.dat').reshape(3,1000,100)[0]
+        self.I = I.T
+        I_err = np.loadtxt(str(filename)+'/signal_1Dspace_'+str(self.wedge)+'_'+str(self.arc)+'_'+str(self.tube)+'.dat').reshape(3,1000,100)[1]
+        self.I_err = I_err.T
+
+        file = str(filename)+'/signal_1Dspace_'+str(self.wedge)+'_'+str(self.arc)+'_'+str(self.tube)+'.dat'
+
+        with open(file, 'r') as the_file:
+            all_data = [line.strip() for line in the_file.readlines()]
+            limits = all_data[28]
+            limits = limits.replace('# xylimits: ', '')
+            limits = limits.split(' ')
+            limits = np.asarray(limits, dtype=float)
+            self.t_s = np.linspace(limits[2], limits[3], 1000)
+            self.y_m = np.linspace(limits[0], limits[1], 100)
+    
+            A4 = all_data[9]
+            A4 = A4.replace('# Param: A4=', '')
+            A4_offset = np.asarray(A4).astype('float')
+
+            A3 = all_data[10]
+            A3 = A3.replace('# Param: A3=', '')
+            self.A3 = np.asarray(A3).astype('float') 
+
 
         ################## Modify A4 for each pixel in tube #####################
         # Get the angular offset from wedge number
         wedge_offsets = np.array([0, 10, 20, 30, 40, 50, 60, 70, 80])
-        wedge_offset = wedge_offsets[self.wedge]
+        wedge_offset = np.array(wedge_offsets[self.wedge])
             
         # Calculate the A4 degrees for each pixel on tube
         self.dA4 = np.degrees(np.arctan((self.y_m/self.L_sd)))
@@ -206,7 +224,6 @@ class tube_measurement:
         
         # Reshape A4 to have A4 for each matrix
         de_dt = np.tile(de_dt, (len(self.I[:,0]),1))
-        
         self.I = self.I/de_dt
         
         return self.I
