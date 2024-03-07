@@ -157,7 +157,7 @@ class tube_measurement:
         # Define constants
         t = self.t_s # time measured in [s] has shape (N time bins)
         Ef_J = self.Ef*1.602176634e-22 # [J]
-        Li = 162 # [m]
+        Li = 162# +3.14 # [m] # AHHHH!!! OFFSET NEEDED TO GET RIGHT DELTA E!!!!
         m_n = 1.67492749804e-27 # [kg]
 
         # calculate Delta E for all points I
@@ -220,14 +220,13 @@ class tube_measurement:
         """
         m_n = 1.67492749804e-27 # [kg]
     
-        de_dt = (m_n*(162+self.L_sd)**2)/(self.t_s**3)*6.24150907e21 # convert from J to meV
+        de_dt = (m_n*(162-6.35+self.L_sd)**2)/(self.t_s**3)*6.24150907e21 # convert from J to meV
         
         # Reshape A4 to have A4 for each matrix
         de_dt = np.tile(de_dt, (len(self.I[:,0]),1))
         self.I = self.I/de_dt
         
         return self.I
-    
 
 
     def load_Backend_measurment(filepath, Correct=False):
