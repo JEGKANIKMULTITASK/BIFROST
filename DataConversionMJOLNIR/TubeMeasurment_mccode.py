@@ -267,3 +267,28 @@ class tube_measurement:
         qy = np.asarray(qy).flatten()
 
         return I, I_err, DeltaE, qx, qy
+    
+    def load_scan(keyword, output_filename, reduce_zero=False):
+
+    # Search for files containing the keyword in the filename
+        files_with_keyword = [file for file in os.listdir() if keyword in file]
+
+        if not files_with_keyword:
+            print("No files found with the specified keyword.")
+            return
+        
+        with open(output_filename, 'a') as output_file:
+            for file_with_keyword in files_with_keyword:
+                
+                # Load information from the file
+                processed_data = tube_measurement.load_Backend_measurment(file_with_keyword)
+                
+                # Convert tuple of results to nd.array
+                matrix = np.column_stack(processed_data)
+
+                # Reduce all datapoints where I = 0
+                
+
+                # Append processed data to output file
+                np.savetxt(output_file, matrix, delimiter='\t', fmt='%f')
+                output_file.write('\n')
