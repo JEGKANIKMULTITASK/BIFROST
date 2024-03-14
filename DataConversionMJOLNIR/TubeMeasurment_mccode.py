@@ -156,9 +156,10 @@ class tube_measurement:
         self.Ef = (9.045/(ideal_lam*np.cos(np.radians(self.dA4))))**2
 
         # Define constants
-        t = self.t_s # time measured in [s] has shape (N time bins)
+        t_offset_optimal = 6940.56*1e-6
+        t = self.t_s - t_offset_optimal # time measured in [s] has shape (N time bins)
         Ef_J = self.Ef*1.602176634e-22 # [J]
-        Li = 162# +3.14 # [m] # AHHHH!!! OFFSET NEEDED TO GET RIGHT DELTA E!!!!
+        Li = (162-6.35)# +3.14 # [m] # AHHHH!!! OFFSET NEEDED TO GET RIGHT DELTA E!!!!
         m_n = 1.67492749804e-27 # [kg]
 
         # calculate Delta E for all points I
