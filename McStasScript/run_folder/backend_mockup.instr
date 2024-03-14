@@ -15,7 +15,7 @@
 * 
 * %Identification
 * Written by: Python McStas Instrument Generator
-* Date: 22:35:06 on March 07, 2024
+* Date: 15:07:05 on March 14, 2024
 * Origin: ESS DMSC
 * %INSTRUMENT_SITE: Generated_instruments
 * 
@@ -26,8 +26,9 @@
 ********************************************************************************/
 
 DEFINE INSTRUMENT backend_mockup (
-A4 = 60, // Scattering angle from sample
-A3 = 40 // Sample rotation angle
+A4 = 30, // Scattering angle from sample
+A3 = 0, // Sample rotation angle
+Vir_repeat = 1 // Sample rotation angle
 )
 
 DECLARE 
@@ -41,7 +42,7 @@ INITIALIZE
 
 TRACE 
 COMPONENT Vir_source = MCPL_input(
- filename = "HighFlux_OptimalLamBand.mcpl")
+ filename = "HighFlux_OptimalLamBand.mcpl", repeat_count = Vir_repeat)
 AT (0,0,0) ABSOLUTE
 
 COMPONENT sample_pos = Arm()
@@ -64,63 +65,13 @@ COMPONENT E_mon_before = E_monitor(
 AT (0,0,0.5) RELATIVE Vir_source
 ROTATED (0,0,0) RELATIVE Vir_source
 
-COMPONENT phonon_sample = Phonon_simple(
- radius = 0.0025, yheight = 0.005,
- sigma_abs = 0.171, sigma_inc = 0.003,
- a = 4.95, b = 9.4,
- M = 207.2, c = 10,
- DW = 1, T = 290,
- target_x = sin((A4 + 40 - A3) * PI / 180.0), target_z = cos((A4 + 40 - A3) * PI / 180.0),
- focus_aw = 110, focus_ah = 8)
+COMPONENT pow_sample = PowderN(
+ reflections = "Na2Ca3Al2F14.laz", radius = 0.005,
+ yheight = 0.01, delta_d_d = 0,
+ DW = 1, d_omega = 300,
+ d_phi = 8)
 AT (0,0,0) RELATIVE A3_rot
 ROTATED (0,0,0) RELATIVE A3_rot
-
-COMPONENT E_mon_after = E_monitor(
- nE = 100, filename = "E_mon_after.dat",
- xwidth = 0.5, yheight = 0.5,
- Emin = 0, Emax = 15,
- restore_neutron = 1)
-AT (0,0,0.5) RELATIVE A3_rot
-ROTATED (0,0,0) RELATIVE A3_rot
-
-COMPONENT init = Union_init()
-AT (0,0,0) ABSOLUTE
-
-COMPONENT Al_inc = Incoherent_process(
- sigma = 0.0328, unit_cell_volume = 66.4)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT Al_pow = Powder_process(
- reflections = "Al.laz")
-AT (0,0,0) ABSOLUTE
-
-COMPONENT Al = Union_make_material(
- process_string = "Al_inc,Al_pow", my_absorption = 1.39157)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT PG_crystal_cohelas = NCrystal_process(
- cfg = "C_sg194_pyrolytic_graphite.ncmat;dir1=@crys_hkl:0,0,2@lab:0,0,1;dir2=@crys_hkl:9,9,9@lab:9,9,9;dirtol=180deg;incoh_elas=0;inelas=0;lcaxis=0,0,1;mos=50arcmin;sans=0;temp=25C")
-AT (0,0,0) ABSOLUTE
-
-COMPONENT PG_crystal_incohelas = NCrystal_process(
- cfg = "C_sg194_pyrolytic_graphite.ncmat;coh_elas=0;dir1=@crys_hkl:0,0,2@lab:0,0,1;dir2=@crys_hkl:9,9,9@lab:9,9,9;dirtol=180deg;inelas=0;lcaxis=0,0,1;mos=50arcmin;sans=0;temp=25C")
-AT (0,0,0) ABSOLUTE
-
-COMPONENT PG_crystal_inelas = NCrystal_process(
- cfg = "C_sg194_pyrolytic_graphite.ncmat;coh_elas=0;dir1=@crys_hkl:0,0,2@lab:0,0,1;dir2=@crys_hkl:9,9,9@lab:9,9,9;dirtol=180deg;incoh_elas=0;lcaxis=0,0,1;mos=50arcmin;sans=0;temp=25C")
-AT (0,0,0) ABSOLUTE
-
-COMPONENT PG_crystal = Union_make_material(
- process_string = "PG_crystal_cohelas,PG_crystal_incohelas,PG_crystal_inelas", my_absorption = 0.0396761)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT He3_inc = Incoherent_process(
- sigma = 0.0116603, unit_cell_volume = 100)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT He3 = Union_make_material(
- process_string = "He3_inc", my_absorption = 38.8654)
-AT (0,0,0) ABSOLUTE
 
 COMPONENT wedge_arm_0 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -130,129 +81,90 @@ COMPONENT ana_arm_1_4_0 = Arm()
 AT (0,0,1.557) RELATIVE wedge_arm_0
 ROTATED (0,0,0) RELATIVE wedge_arm_0
 
-COMPONENT PG_piece_1_4_0_0 = Union_box(
- material_string = "PG_crystal", priority = 0.1,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_0_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.034879,-0.050095999999999995) RELATIVE ana_arm_1_4_0
-ROTATED (-54.254,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-54.254,90,0) RELATIVE ana_arm_1_4_0
 
-COMPONENT PG_piece_1_4_1_0 = Union_box(
- material_string = "PG_crystal", priority = 0.2,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_1_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.026376999999999998,-0.037422) RELATIVE ana_arm_1_4_0
-ROTATED (-53.923,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-53.923,90,0) RELATIVE ana_arm_1_4_0
 
-COMPONENT PG_piece_1_4_2_0 = Union_box(
- material_string = "PG_crystal", priority = 0.3,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_2_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.017728999999999998,-0.024846) RELATIVE ana_arm_1_4_0
-ROTATED (-53.591,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-53.591,90,0) RELATIVE ana_arm_1_4_0
 
-COMPONENT PG_piece_1_4_3_0 = Union_box(
- material_string = "PG_crystal", priority = 0.4,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_3_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.008936999999999999,-0.012372) RELATIVE ana_arm_1_4_0
-ROTATED (-53.26,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-53.26,90,0) RELATIVE ana_arm_1_4_0
 
-COMPONENT PG_piece_1_4_4_0 = Union_box(
- material_string = "PG_crystal", priority = 0.5,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_4_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_1_4_0
-ROTATED (-52.928,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-52.928,90,0) RELATIVE ana_arm_1_4_0
 
-COMPONENT PG_piece_1_4_5_0 = Union_box(
- material_string = "PG_crystal", priority = 0.6,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_5_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009079,0.012268000000000001) RELATIVE ana_arm_1_4_0
-ROTATED (-52.597,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-52.597,90,0) RELATIVE ana_arm_1_4_0
 
-COMPONENT PG_piece_1_4_6_0 = Union_box(
- material_string = "PG_crystal", priority = 0.7,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_6_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.0183,0.024429) RELATIVE ana_arm_1_4_0
-ROTATED (-52.265,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-52.265,90,0) RELATIVE ana_arm_1_4_0
 
-COMPONENT PG_piece_1_4_7_0 = Union_box(
- material_string = "PG_crystal", priority = 0.8,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_7_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.02766,0.036484) RELATIVE ana_arm_1_4_0
-ROTATED (-51.934,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-51.934,90,0) RELATIVE ana_arm_1_4_0
 
-COMPONENT PG_piece_1_4_8_0 = Union_box(
- material_string = "PG_crystal", priority = 0.9,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_8_0 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.03716,0.048429) RELATIVE ana_arm_1_4_0
-ROTATED (-51.603,0,0) RELATIVE ana_arm_1_4_0
+ROTATED (-51.603,90,0) RELATIVE ana_arm_1_4_0
 
 COMPONENT det_arm_1_4_0 = Arm()
 AT (0,-1.5612402,2.0004613) RELATIVE wedge_arm_0
 ROTATED (0,0,0) RELATIVE wedge_arm_0
 
-COMPONENT det_0_outer_1_4_0 = Union_cylinder(
- material_string = "Al", priority = 0.11,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_close_He3_1_4_0 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_0_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_0
 ROTATED (0,0,90) RELATIVE det_arm_1_4_0
 
-COMPONENT det_0_He3_1_4_0 = Union_cylinder(
- material_string = "He3", priority = 0.12,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_0
-ROTATED (0,0,90) RELATIVE det_arm_1_4_0
-
-COMPONENT signal_tof_1Dspace_01_4_0 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_1_4_0", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_0_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_1_4_0
-
-COMPONENT det_1_outer_1_4_0 = Union_cylinder(
- material_string = "Al", priority = 0.14,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_mid_He3_1_4_0 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_0_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_1_4_0
 ROTATED (0,0,90) RELATIVE det_arm_1_4_0
 
-COMPONENT det_1_He3_1_4_0 = Union_cylinder(
- material_string = "He3", priority = 0.15,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_0
-ROTATED (0,0,90) RELATIVE det_arm_1_4_0
-
-COMPONENT signal_tof_1Dspace_1_1_4_0 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_1_4_0", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_0_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_1_4_0
-
-COMPONENT det_2_outer_1_4_0 = Union_cylinder(
- material_string = "Al", priority = 0.17,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_far_He3_1_4_0 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_0_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_1_4_0
 ROTATED (0,0,90) RELATIVE det_arm_1_4_0
-
-COMPONENT det_2_He3_1_4_0 = Union_cylinder(
- material_string = "He3", priority = 0.18,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_0
-ROTATED (0,0,90) RELATIVE det_arm_1_4_0
-
-COMPONENT signal_tof_1Dspace_2_1_4_0 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_1_4_0", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_0_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_1_4_0
 
 COMPONENT wedge_arm_10 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -262,129 +174,90 @@ COMPONENT ana_arm_2_4_1 = Arm()
 AT (0,0,1.623) RELATIVE wedge_arm_10
 ROTATED (0,0,0) RELATIVE wedge_arm_10
 
-COMPONENT PG_piece_2_4_0_1 = Union_box(
- material_string = "PG_crystal", priority = 10.1,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_0_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.036386,-0.05055) RELATIVE ana_arm_2_4_1
-ROTATED (-54.254,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-54.254,90,0) RELATIVE ana_arm_2_4_1
 
-COMPONENT PG_piece_2_4_1_1 = Union_box(
- material_string = "PG_crystal", priority = 10.2,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_1_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.027509,-0.037756) RELATIVE ana_arm_2_4_1
-ROTATED (-53.923,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-53.923,90,0) RELATIVE ana_arm_2_4_1
 
-COMPONENT PG_piece_2_4_2_1 = Union_box(
- material_string = "PG_crystal", priority = 10.3,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_2_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.018484999999999998,-0.025065) RELATIVE ana_arm_2_4_1
-ROTATED (-53.591,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-53.591,90,0) RELATIVE ana_arm_2_4_1
 
-COMPONENT PG_piece_2_4_3_1 = Union_box(
- material_string = "PG_crystal", priority = 10.4,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_3_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.009315,-0.012478999999999999) RELATIVE ana_arm_2_4_1
-ROTATED (-53.26,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-53.26,90,0) RELATIVE ana_arm_2_4_1
 
-COMPONENT PG_piece_2_4_4_1 = Union_box(
- material_string = "PG_crystal", priority = 10.5,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_4_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_2_4_1
-ROTATED (-52.928,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-52.928,90,0) RELATIVE ana_arm_2_4_1
 
-COMPONENT PG_piece_2_4_5_1 = Union_box(
- material_string = "PG_crystal", priority = 10.6,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_5_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009459,0.012369999999999999) RELATIVE ana_arm_2_4_1
-ROTATED (-52.597,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-52.597,90,0) RELATIVE ana_arm_2_4_1
 
-COMPONENT PG_piece_2_4_6_1 = Union_box(
- material_string = "PG_crystal", priority = 10.7,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_6_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.019059999999999997,0.02463) RELATIVE ana_arm_2_4_1
-ROTATED (-52.265,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-52.265,90,0) RELATIVE ana_arm_2_4_1
 
-COMPONENT PG_piece_2_4_7_1 = Union_box(
- material_string = "PG_crystal", priority = 10.8,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_7_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.028802,0.036778) RELATIVE ana_arm_2_4_1
-ROTATED (-51.934,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-51.934,90,0) RELATIVE ana_arm_2_4_1
 
-COMPONENT PG_piece_2_4_8_1 = Union_box(
- material_string = "PG_crystal", priority = 10.9,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_8_1 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.038685000000000004,0.048813) RELATIVE ana_arm_2_4_1
-ROTATED (-51.603,0,0) RELATIVE ana_arm_2_4_1
+ROTATED (-51.603,90,0) RELATIVE ana_arm_2_4_1
 
 COMPONENT det_arm_2_4_1 = Arm()
 AT (0,-1.5612402,2.0664613) RELATIVE wedge_arm_10
 ROTATED (0,0,0) RELATIVE wedge_arm_10
 
-COMPONENT det_0_outer_2_4_1 = Union_cylinder(
- material_string = "Al", priority = 10.11,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_close_He3_2_4_1 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_1_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_1
 ROTATED (0,0,90) RELATIVE det_arm_2_4_1
 
-COMPONENT det_0_He3_2_4_1 = Union_cylinder(
- material_string = "He3", priority = 10.12,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_1
-ROTATED (0,0,90) RELATIVE det_arm_2_4_1
-
-COMPONENT signal_tof_1Dspace_02_4_1 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_2_4_1", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_1_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_2_4_1
-
-COMPONENT det_1_outer_2_4_1 = Union_cylinder(
- material_string = "Al", priority = 10.14,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_mid_He3_2_4_1 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_1_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_2_4_1
 ROTATED (0,0,90) RELATIVE det_arm_2_4_1
 
-COMPONENT det_1_He3_2_4_1 = Union_cylinder(
- material_string = "He3", priority = 10.15,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_1
-ROTATED (0,0,90) RELATIVE det_arm_2_4_1
-
-COMPONENT signal_tof_1Dspace_1_2_4_1 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_2_4_1", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_1_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_2_4_1
-
-COMPONENT det_2_outer_2_4_1 = Union_cylinder(
- material_string = "Al", priority = 10.17,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_far_He3_2_4_1 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_1_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_2_4_1
 ROTATED (0,0,90) RELATIVE det_arm_2_4_1
-
-COMPONENT det_2_He3_2_4_1 = Union_cylinder(
- material_string = "He3", priority = 10.18,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_1
-ROTATED (0,0,90) RELATIVE det_arm_2_4_1
-
-COMPONENT signal_tof_1Dspace_2_2_4_1 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_2_4_1", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_1_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_2_4_1
 
 COMPONENT wedge_arm_20 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -394,129 +267,90 @@ COMPONENT ana_arm_3_4_2 = Arm()
 AT (0,0,1.701) RELATIVE wedge_arm_20
 ROTATED (0,0,0) RELATIVE wedge_arm_20
 
-COMPONENT PG_piece_3_4_0_2 = Union_box(
- material_string = "PG_crystal", priority = 20.1,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_0_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.038165,-0.051087) RELATIVE ana_arm_3_4_2
-ROTATED (-54.254,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-54.254,90,0) RELATIVE ana_arm_3_4_2
 
-COMPONENT PG_piece_3_4_1_2 = Union_box(
- material_string = "PG_crystal", priority = 20.2,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_1_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.028846,-0.038149999999999996) RELATIVE ana_arm_3_4_2
-ROTATED (-53.923,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-53.923,90,0) RELATIVE ana_arm_3_4_2
 
-COMPONENT PG_piece_3_4_2_2 = Union_box(
- material_string = "PG_crystal", priority = 20.3,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_2_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.019378,-0.025323000000000002) RELATIVE ana_arm_3_4_2
-ROTATED (-53.591,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-53.591,90,0) RELATIVE ana_arm_3_4_2
 
-COMPONENT PG_piece_3_4_3_2 = Union_box(
- material_string = "PG_crystal", priority = 20.4,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_3_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.009762,-0.012605) RELATIVE ana_arm_3_4_2
-ROTATED (-53.26,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-53.26,90,0) RELATIVE ana_arm_3_4_2
 
-COMPONENT PG_piece_3_4_4_2 = Union_box(
- material_string = "PG_crystal", priority = 20.5,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_4_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_3_4_2
-ROTATED (-52.928,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-52.928,90,0) RELATIVE ana_arm_3_4_2
 
-COMPONENT PG_piece_3_4_5_2 = Union_box(
- material_string = "PG_crystal", priority = 20.6,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_5_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009907000000000001,0.012492000000000001) RELATIVE ana_arm_3_4_2
-ROTATED (-52.597,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-52.597,90,0) RELATIVE ana_arm_3_4_2
 
-COMPONENT PG_piece_3_4_6_2 = Union_box(
- material_string = "PG_crystal", priority = 20.7,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_6_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.019958,0.024867999999999998) RELATIVE ana_arm_3_4_2
-ROTATED (-52.265,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-52.265,90,0) RELATIVE ana_arm_3_4_2
 
-COMPONENT PG_piece_3_4_7_2 = Union_box(
- material_string = "PG_crystal", priority = 20.8,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_7_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.030152,0.037127) RELATIVE ana_arm_3_4_2
-ROTATED (-51.934,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-51.934,90,0) RELATIVE ana_arm_3_4_2
 
-COMPONENT PG_piece_3_4_8_2 = Union_box(
- material_string = "PG_crystal", priority = 20.9,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_8_2 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.040487,0.049267000000000005) RELATIVE ana_arm_3_4_2
-ROTATED (-51.603,0,0) RELATIVE ana_arm_3_4_2
+ROTATED (-51.603,90,0) RELATIVE ana_arm_3_4_2
 
 COMPONENT det_arm_3_4_2 = Arm()
 AT (0,-1.5612402,2.1444613) RELATIVE wedge_arm_20
 ROTATED (0,0,0) RELATIVE wedge_arm_20
 
-COMPONENT det_0_outer_3_4_2 = Union_cylinder(
- material_string = "Al", priority = 20.11,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_close_He3_3_4_2 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_2_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_2
 ROTATED (0,0,90) RELATIVE det_arm_3_4_2
 
-COMPONENT det_0_He3_3_4_2 = Union_cylinder(
- material_string = "He3", priority = 20.12,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_2
-ROTATED (0,0,90) RELATIVE det_arm_3_4_2
-
-COMPONENT signal_tof_1Dspace_03_4_2 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_3_4_2", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_2_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_3_4_2
-
-COMPONENT det_1_outer_3_4_2 = Union_cylinder(
- material_string = "Al", priority = 20.14,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_mid_He3_3_4_2 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_2_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_3_4_2
 ROTATED (0,0,90) RELATIVE det_arm_3_4_2
 
-COMPONENT det_1_He3_3_4_2 = Union_cylinder(
- material_string = "He3", priority = 20.15,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_2
-ROTATED (0,0,90) RELATIVE det_arm_3_4_2
-
-COMPONENT signal_tof_1Dspace_1_3_4_2 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_3_4_2", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_2_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_3_4_2
-
-COMPONENT det_2_outer_3_4_2 = Union_cylinder(
- material_string = "Al", priority = 20.17,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_far_He3_3_4_2 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_2_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_3_4_2
 ROTATED (0,0,90) RELATIVE det_arm_3_4_2
-
-COMPONENT det_2_He3_3_4_2 = Union_cylinder(
- material_string = "He3", priority = 20.18,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_2
-ROTATED (0,0,90) RELATIVE det_arm_3_4_2
-
-COMPONENT signal_tof_1Dspace_2_3_4_2 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_3_4_2", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_2_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_3_4_2
 
 COMPONENT wedge_arm_30 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -526,129 +360,90 @@ COMPONENT ana_arm_1_4_3 = Arm()
 AT (0,0,1.557) RELATIVE wedge_arm_30
 ROTATED (0,0,0) RELATIVE wedge_arm_30
 
-COMPONENT PG_piece_1_4_0_3 = Union_box(
- material_string = "PG_crystal", priority = 30.1,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_0_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.034879,-0.050095999999999995) RELATIVE ana_arm_1_4_3
-ROTATED (-54.254,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-54.254,90,0) RELATIVE ana_arm_1_4_3
 
-COMPONENT PG_piece_1_4_1_3 = Union_box(
- material_string = "PG_crystal", priority = 30.2,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_1_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.026376999999999998,-0.037422) RELATIVE ana_arm_1_4_3
-ROTATED (-53.923,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-53.923,90,0) RELATIVE ana_arm_1_4_3
 
-COMPONENT PG_piece_1_4_2_3 = Union_box(
- material_string = "PG_crystal", priority = 30.3,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_2_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.017728999999999998,-0.024846) RELATIVE ana_arm_1_4_3
-ROTATED (-53.591,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-53.591,90,0) RELATIVE ana_arm_1_4_3
 
-COMPONENT PG_piece_1_4_3_3 = Union_box(
- material_string = "PG_crystal", priority = 30.4,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_3_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.008936999999999999,-0.012372) RELATIVE ana_arm_1_4_3
-ROTATED (-53.26,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-53.26,90,0) RELATIVE ana_arm_1_4_3
 
-COMPONENT PG_piece_1_4_4_3 = Union_box(
- material_string = "PG_crystal", priority = 30.5,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_4_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_1_4_3
-ROTATED (-52.928,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-52.928,90,0) RELATIVE ana_arm_1_4_3
 
-COMPONENT PG_piece_1_4_5_3 = Union_box(
- material_string = "PG_crystal", priority = 30.6,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_5_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009079,0.012268000000000001) RELATIVE ana_arm_1_4_3
-ROTATED (-52.597,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-52.597,90,0) RELATIVE ana_arm_1_4_3
 
-COMPONENT PG_piece_1_4_6_3 = Union_box(
- material_string = "PG_crystal", priority = 30.7,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_6_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.0183,0.024429) RELATIVE ana_arm_1_4_3
-ROTATED (-52.265,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-52.265,90,0) RELATIVE ana_arm_1_4_3
 
-COMPONENT PG_piece_1_4_7_3 = Union_box(
- material_string = "PG_crystal", priority = 30.8,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_7_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.02766,0.036484) RELATIVE ana_arm_1_4_3
-ROTATED (-51.934,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-51.934,90,0) RELATIVE ana_arm_1_4_3
 
-COMPONENT PG_piece_1_4_8_3 = Union_box(
- material_string = "PG_crystal", priority = 30.9,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_8_3 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.03716,0.048429) RELATIVE ana_arm_1_4_3
-ROTATED (-51.603,0,0) RELATIVE ana_arm_1_4_3
+ROTATED (-51.603,90,0) RELATIVE ana_arm_1_4_3
 
 COMPONENT det_arm_1_4_3 = Arm()
 AT (0,-1.5612402,2.0004613) RELATIVE wedge_arm_30
 ROTATED (0,0,0) RELATIVE wedge_arm_30
 
-COMPONENT det_0_outer_1_4_3 = Union_cylinder(
- material_string = "Al", priority = 30.11,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_close_He3_1_4_3 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_3_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_3
 ROTATED (0,0,90) RELATIVE det_arm_1_4_3
 
-COMPONENT det_0_He3_1_4_3 = Union_cylinder(
- material_string = "He3", priority = 30.12,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_3
-ROTATED (0,0,90) RELATIVE det_arm_1_4_3
-
-COMPONENT signal_tof_1Dspace_01_4_3 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_1_4_3", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_3_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_1_4_3
-
-COMPONENT det_1_outer_1_4_3 = Union_cylinder(
- material_string = "Al", priority = 30.14,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_mid_He3_1_4_3 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_3_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_1_4_3
 ROTATED (0,0,90) RELATIVE det_arm_1_4_3
 
-COMPONENT det_1_He3_1_4_3 = Union_cylinder(
- material_string = "He3", priority = 30.15,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_3
-ROTATED (0,0,90) RELATIVE det_arm_1_4_3
-
-COMPONENT signal_tof_1Dspace_1_1_4_3 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_1_4_3", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_3_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_1_4_3
-
-COMPONENT det_2_outer_1_4_3 = Union_cylinder(
- material_string = "Al", priority = 30.17,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_far_He3_1_4_3 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_3_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_1_4_3
 ROTATED (0,0,90) RELATIVE det_arm_1_4_3
-
-COMPONENT det_2_He3_1_4_3 = Union_cylinder(
- material_string = "He3", priority = 30.18,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_3
-ROTATED (0,0,90) RELATIVE det_arm_1_4_3
-
-COMPONENT signal_tof_1Dspace_2_1_4_3 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_1_4_3", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_3_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_1_4_3
 
 COMPONENT wedge_arm_40 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -658,129 +453,90 @@ COMPONENT ana_arm_2_4_4 = Arm()
 AT (0,0,1.623) RELATIVE wedge_arm_40
 ROTATED (0,0,0) RELATIVE wedge_arm_40
 
-COMPONENT PG_piece_2_4_0_4 = Union_box(
- material_string = "PG_crystal", priority = 40.1,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_0_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.036386,-0.05055) RELATIVE ana_arm_2_4_4
-ROTATED (-54.254,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-54.254,90,0) RELATIVE ana_arm_2_4_4
 
-COMPONENT PG_piece_2_4_1_4 = Union_box(
- material_string = "PG_crystal", priority = 40.2,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_1_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.027509,-0.037756) RELATIVE ana_arm_2_4_4
-ROTATED (-53.923,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-53.923,90,0) RELATIVE ana_arm_2_4_4
 
-COMPONENT PG_piece_2_4_2_4 = Union_box(
- material_string = "PG_crystal", priority = 40.3,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_2_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.018484999999999998,-0.025065) RELATIVE ana_arm_2_4_4
-ROTATED (-53.591,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-53.591,90,0) RELATIVE ana_arm_2_4_4
 
-COMPONENT PG_piece_2_4_3_4 = Union_box(
- material_string = "PG_crystal", priority = 40.4,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_3_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.009315,-0.012478999999999999) RELATIVE ana_arm_2_4_4
-ROTATED (-53.26,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-53.26,90,0) RELATIVE ana_arm_2_4_4
 
-COMPONENT PG_piece_2_4_4_4 = Union_box(
- material_string = "PG_crystal", priority = 40.5,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_4_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_2_4_4
-ROTATED (-52.928,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-52.928,90,0) RELATIVE ana_arm_2_4_4
 
-COMPONENT PG_piece_2_4_5_4 = Union_box(
- material_string = "PG_crystal", priority = 40.6,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_5_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009459,0.012369999999999999) RELATIVE ana_arm_2_4_4
-ROTATED (-52.597,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-52.597,90,0) RELATIVE ana_arm_2_4_4
 
-COMPONENT PG_piece_2_4_6_4 = Union_box(
- material_string = "PG_crystal", priority = 40.7,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_6_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.019059999999999997,0.02463) RELATIVE ana_arm_2_4_4
-ROTATED (-52.265,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-52.265,90,0) RELATIVE ana_arm_2_4_4
 
-COMPONENT PG_piece_2_4_7_4 = Union_box(
- material_string = "PG_crystal", priority = 40.8,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_7_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.028802,0.036778) RELATIVE ana_arm_2_4_4
-ROTATED (-51.934,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-51.934,90,0) RELATIVE ana_arm_2_4_4
 
-COMPONENT PG_piece_2_4_8_4 = Union_box(
- material_string = "PG_crystal", priority = 40.9,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_8_4 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.038685000000000004,0.048813) RELATIVE ana_arm_2_4_4
-ROTATED (-51.603,0,0) RELATIVE ana_arm_2_4_4
+ROTATED (-51.603,90,0) RELATIVE ana_arm_2_4_4
 
 COMPONENT det_arm_2_4_4 = Arm()
 AT (0,-1.5612402,2.0664613) RELATIVE wedge_arm_40
 ROTATED (0,0,0) RELATIVE wedge_arm_40
 
-COMPONENT det_0_outer_2_4_4 = Union_cylinder(
- material_string = "Al", priority = 40.11,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_close_He3_2_4_4 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_4_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_4
 ROTATED (0,0,90) RELATIVE det_arm_2_4_4
 
-COMPONENT det_0_He3_2_4_4 = Union_cylinder(
- material_string = "He3", priority = 40.12,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_4
-ROTATED (0,0,90) RELATIVE det_arm_2_4_4
-
-COMPONENT signal_tof_1Dspace_02_4_4 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_2_4_4", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_4_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_2_4_4
-
-COMPONENT det_1_outer_2_4_4 = Union_cylinder(
- material_string = "Al", priority = 40.14,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_mid_He3_2_4_4 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_4_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_2_4_4
 ROTATED (0,0,90) RELATIVE det_arm_2_4_4
 
-COMPONENT det_1_He3_2_4_4 = Union_cylinder(
- material_string = "He3", priority = 40.15,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_4
-ROTATED (0,0,90) RELATIVE det_arm_2_4_4
-
-COMPONENT signal_tof_1Dspace_1_2_4_4 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_2_4_4", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_4_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_2_4_4
-
-COMPONENT det_2_outer_2_4_4 = Union_cylinder(
- material_string = "Al", priority = 40.17,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_far_He3_2_4_4 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_4_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_2_4_4
 ROTATED (0,0,90) RELATIVE det_arm_2_4_4
-
-COMPONENT det_2_He3_2_4_4 = Union_cylinder(
- material_string = "He3", priority = 40.18,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_4
-ROTATED (0,0,90) RELATIVE det_arm_2_4_4
-
-COMPONENT signal_tof_1Dspace_2_2_4_4 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_2_4_4", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_4_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_2_4_4
 
 COMPONENT wedge_arm_50 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -790,129 +546,90 @@ COMPONENT ana_arm_3_4_5 = Arm()
 AT (0,0,1.701) RELATIVE wedge_arm_50
 ROTATED (0,0,0) RELATIVE wedge_arm_50
 
-COMPONENT PG_piece_3_4_0_5 = Union_box(
- material_string = "PG_crystal", priority = 50.1,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_0_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.038165,-0.051087) RELATIVE ana_arm_3_4_5
-ROTATED (-54.254,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-54.254,90,0) RELATIVE ana_arm_3_4_5
 
-COMPONENT PG_piece_3_4_1_5 = Union_box(
- material_string = "PG_crystal", priority = 50.2,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_1_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.028846,-0.038149999999999996) RELATIVE ana_arm_3_4_5
-ROTATED (-53.923,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-53.923,90,0) RELATIVE ana_arm_3_4_5
 
-COMPONENT PG_piece_3_4_2_5 = Union_box(
- material_string = "PG_crystal", priority = 50.3,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_2_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.019378,-0.025323000000000002) RELATIVE ana_arm_3_4_5
-ROTATED (-53.591,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-53.591,90,0) RELATIVE ana_arm_3_4_5
 
-COMPONENT PG_piece_3_4_3_5 = Union_box(
- material_string = "PG_crystal", priority = 50.4,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_3_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.009762,-0.012605) RELATIVE ana_arm_3_4_5
-ROTATED (-53.26,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-53.26,90,0) RELATIVE ana_arm_3_4_5
 
-COMPONENT PG_piece_3_4_4_5 = Union_box(
- material_string = "PG_crystal", priority = 50.5,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_4_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_3_4_5
-ROTATED (-52.928,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-52.928,90,0) RELATIVE ana_arm_3_4_5
 
-COMPONENT PG_piece_3_4_5_5 = Union_box(
- material_string = "PG_crystal", priority = 50.6,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_5_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009907000000000001,0.012492000000000001) RELATIVE ana_arm_3_4_5
-ROTATED (-52.597,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-52.597,90,0) RELATIVE ana_arm_3_4_5
 
-COMPONENT PG_piece_3_4_6_5 = Union_box(
- material_string = "PG_crystal", priority = 50.7,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_6_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.019958,0.024867999999999998) RELATIVE ana_arm_3_4_5
-ROTATED (-52.265,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-52.265,90,0) RELATIVE ana_arm_3_4_5
 
-COMPONENT PG_piece_3_4_7_5 = Union_box(
- material_string = "PG_crystal", priority = 50.8,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_7_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.030152,0.037127) RELATIVE ana_arm_3_4_5
-ROTATED (-51.934,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-51.934,90,0) RELATIVE ana_arm_3_4_5
 
-COMPONENT PG_piece_3_4_8_5 = Union_box(
- material_string = "PG_crystal", priority = 50.9,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_8_5 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.040487,0.049267000000000005) RELATIVE ana_arm_3_4_5
-ROTATED (-51.603,0,0) RELATIVE ana_arm_3_4_5
+ROTATED (-51.603,90,0) RELATIVE ana_arm_3_4_5
 
 COMPONENT det_arm_3_4_5 = Arm()
 AT (0,-1.5612402,2.1444613) RELATIVE wedge_arm_50
 ROTATED (0,0,0) RELATIVE wedge_arm_50
 
-COMPONENT det_0_outer_3_4_5 = Union_cylinder(
- material_string = "Al", priority = 50.11,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_close_He3_3_4_5 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_5_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_5
 ROTATED (0,0,90) RELATIVE det_arm_3_4_5
 
-COMPONENT det_0_He3_3_4_5 = Union_cylinder(
- material_string = "He3", priority = 50.12,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_5
-ROTATED (0,0,90) RELATIVE det_arm_3_4_5
-
-COMPONENT signal_tof_1Dspace_03_4_5 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_3_4_5", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_5_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_3_4_5
-
-COMPONENT det_1_outer_3_4_5 = Union_cylinder(
- material_string = "Al", priority = 50.14,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_mid_He3_3_4_5 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_5_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_3_4_5
 ROTATED (0,0,90) RELATIVE det_arm_3_4_5
 
-COMPONENT det_1_He3_3_4_5 = Union_cylinder(
- material_string = "He3", priority = 50.15,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_5
-ROTATED (0,0,90) RELATIVE det_arm_3_4_5
-
-COMPONENT signal_tof_1Dspace_1_3_4_5 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_3_4_5", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_5_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_3_4_5
-
-COMPONENT det_2_outer_3_4_5 = Union_cylinder(
- material_string = "Al", priority = 50.17,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_far_He3_3_4_5 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_5_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_3_4_5
 ROTATED (0,0,90) RELATIVE det_arm_3_4_5
-
-COMPONENT det_2_He3_3_4_5 = Union_cylinder(
- material_string = "He3", priority = 50.18,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_5
-ROTATED (0,0,90) RELATIVE det_arm_3_4_5
-
-COMPONENT signal_tof_1Dspace_2_3_4_5 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_3_4_5", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_5_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_3_4_5
 
 COMPONENT wedge_arm_60 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -922,129 +639,90 @@ COMPONENT ana_arm_1_4_6 = Arm()
 AT (0,0,1.557) RELATIVE wedge_arm_60
 ROTATED (0,0,0) RELATIVE wedge_arm_60
 
-COMPONENT PG_piece_1_4_0_6 = Union_box(
- material_string = "PG_crystal", priority = 60.1,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_0_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.034879,-0.050095999999999995) RELATIVE ana_arm_1_4_6
-ROTATED (-54.254,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-54.254,90,0) RELATIVE ana_arm_1_4_6
 
-COMPONENT PG_piece_1_4_1_6 = Union_box(
- material_string = "PG_crystal", priority = 60.2,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_1_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.026376999999999998,-0.037422) RELATIVE ana_arm_1_4_6
-ROTATED (-53.923,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-53.923,90,0) RELATIVE ana_arm_1_4_6
 
-COMPONENT PG_piece_1_4_2_6 = Union_box(
- material_string = "PG_crystal", priority = 60.3,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_2_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.017728999999999998,-0.024846) RELATIVE ana_arm_1_4_6
-ROTATED (-53.591,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-53.591,90,0) RELATIVE ana_arm_1_4_6
 
-COMPONENT PG_piece_1_4_3_6 = Union_box(
- material_string = "PG_crystal", priority = 60.4,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_3_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.008936999999999999,-0.012372) RELATIVE ana_arm_1_4_6
-ROTATED (-53.26,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-53.26,90,0) RELATIVE ana_arm_1_4_6
 
-COMPONENT PG_piece_1_4_4_6 = Union_box(
- material_string = "PG_crystal", priority = 60.5,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_4_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_1_4_6
-ROTATED (-52.928,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-52.928,90,0) RELATIVE ana_arm_1_4_6
 
-COMPONENT PG_piece_1_4_5_6 = Union_box(
- material_string = "PG_crystal", priority = 60.6,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_5_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009079,0.012268000000000001) RELATIVE ana_arm_1_4_6
-ROTATED (-52.597,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-52.597,90,0) RELATIVE ana_arm_1_4_6
 
-COMPONENT PG_piece_1_4_6_6 = Union_box(
- material_string = "PG_crystal", priority = 60.7,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_6_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.0183,0.024429) RELATIVE ana_arm_1_4_6
-ROTATED (-52.265,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-52.265,90,0) RELATIVE ana_arm_1_4_6
 
-COMPONENT PG_piece_1_4_7_6 = Union_box(
- material_string = "PG_crystal", priority = 60.8,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_7_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.02766,0.036484) RELATIVE ana_arm_1_4_6
-ROTATED (-51.934,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-51.934,90,0) RELATIVE ana_arm_1_4_6
 
-COMPONENT PG_piece_1_4_8_6 = Union_box(
- material_string = "PG_crystal", priority = 60.9,
- xwidth = 0.1756, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_1_4_8_6 = Monochromator_flat(
+ zwidth = 0.1756, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.03716,0.048429) RELATIVE ana_arm_1_4_6
-ROTATED (-51.603,0,0) RELATIVE ana_arm_1_4_6
+ROTATED (-51.603,90,0) RELATIVE ana_arm_1_4_6
 
 COMPONENT det_arm_1_4_6 = Arm()
 AT (0,-1.5612402,2.0004613) RELATIVE wedge_arm_60
 ROTATED (0,0,0) RELATIVE wedge_arm_60
 
-COMPONENT det_0_outer_1_4_6 = Union_cylinder(
- material_string = "Al", priority = 60.11,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_close_He3_1_4_6 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_6_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_6
 ROTATED (0,0,90) RELATIVE det_arm_1_4_6
 
-COMPONENT det_0_He3_1_4_6 = Union_cylinder(
- material_string = "He3", priority = 60.12,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_6
-ROTATED (0,0,90) RELATIVE det_arm_1_4_6
-
-COMPONENT signal_tof_1Dspace_01_4_6 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_1_4_6", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_6_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_1_4_6
-
-COMPONENT det_1_outer_1_4_6 = Union_cylinder(
- material_string = "Al", priority = 60.14,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_mid_He3_1_4_6 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_6_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_1_4_6
 ROTATED (0,0,90) RELATIVE det_arm_1_4_6
 
-COMPONENT det_1_He3_1_4_6 = Union_cylinder(
- material_string = "He3", priority = 60.15,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_6
-ROTATED (0,0,90) RELATIVE det_arm_1_4_6
-
-COMPONENT signal_tof_1Dspace_1_1_4_6 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_1_4_6", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_6_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_1_4_6
-
-COMPONENT det_2_outer_1_4_6 = Union_cylinder(
- material_string = "Al", priority = 60.17,
- radius = 0.0127, yheight = 0.3188)
+COMPONENT det_far_He3_1_4_6 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.2988,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_6_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_1_4_6
 ROTATED (0,0,90) RELATIVE det_arm_1_4_6
-
-COMPONENT det_2_He3_1_4_6 = Union_cylinder(
- material_string = "He3", priority = 60.18,
- radius = 0.0117, yheight = 0.2988)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_1_4_6
-ROTATED (0,0,90) RELATIVE det_arm_1_4_6
-
-COMPONENT signal_tof_1Dspace_2_1_4_6 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_1_4_6", yheight = 0.2988,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_6_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_1_4_6
 
 COMPONENT wedge_arm_70 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -1054,129 +732,90 @@ COMPONENT ana_arm_2_4_7 = Arm()
 AT (0,0,1.623) RELATIVE wedge_arm_70
 ROTATED (0,0,0) RELATIVE wedge_arm_70
 
-COMPONENT PG_piece_2_4_0_7 = Union_box(
- material_string = "PG_crystal", priority = 70.1,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_0_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.036386,-0.05055) RELATIVE ana_arm_2_4_7
-ROTATED (-54.254,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-54.254,90,0) RELATIVE ana_arm_2_4_7
 
-COMPONENT PG_piece_2_4_1_7 = Union_box(
- material_string = "PG_crystal", priority = 70.2,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_1_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.027509,-0.037756) RELATIVE ana_arm_2_4_7
-ROTATED (-53.923,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-53.923,90,0) RELATIVE ana_arm_2_4_7
 
-COMPONENT PG_piece_2_4_2_7 = Union_box(
- material_string = "PG_crystal", priority = 70.3,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_2_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.018484999999999998,-0.025065) RELATIVE ana_arm_2_4_7
-ROTATED (-53.591,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-53.591,90,0) RELATIVE ana_arm_2_4_7
 
-COMPONENT PG_piece_2_4_3_7 = Union_box(
- material_string = "PG_crystal", priority = 70.4,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_3_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.009315,-0.012478999999999999) RELATIVE ana_arm_2_4_7
-ROTATED (-53.26,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-53.26,90,0) RELATIVE ana_arm_2_4_7
 
-COMPONENT PG_piece_2_4_4_7 = Union_box(
- material_string = "PG_crystal", priority = 70.5,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_4_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_2_4_7
-ROTATED (-52.928,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-52.928,90,0) RELATIVE ana_arm_2_4_7
 
-COMPONENT PG_piece_2_4_5_7 = Union_box(
- material_string = "PG_crystal", priority = 70.6,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_5_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009459,0.012369999999999999) RELATIVE ana_arm_2_4_7
-ROTATED (-52.597,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-52.597,90,0) RELATIVE ana_arm_2_4_7
 
-COMPONENT PG_piece_2_4_6_7 = Union_box(
- material_string = "PG_crystal", priority = 70.7,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_6_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.019059999999999997,0.02463) RELATIVE ana_arm_2_4_7
-ROTATED (-52.265,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-52.265,90,0) RELATIVE ana_arm_2_4_7
 
-COMPONENT PG_piece_2_4_7_7 = Union_box(
- material_string = "PG_crystal", priority = 70.8,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_7_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.028802,0.036778) RELATIVE ana_arm_2_4_7
-ROTATED (-51.934,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-51.934,90,0) RELATIVE ana_arm_2_4_7
 
-COMPONENT PG_piece_2_4_8_7 = Union_box(
- material_string = "PG_crystal", priority = 70.9,
- xwidth = 0.1816, yheight = 0.0135,
- zdepth = 0.001)
+COMPONENT PG_piece_2_4_8_7 = Monochromator_flat(
+ zwidth = 0.1816, yheight = 0.0135,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.038685000000000004,0.048813) RELATIVE ana_arm_2_4_7
-ROTATED (-51.603,0,0) RELATIVE ana_arm_2_4_7
+ROTATED (-51.603,90,0) RELATIVE ana_arm_2_4_7
 
 COMPONENT det_arm_2_4_7 = Arm()
 AT (0,-1.5612402,2.0664613) RELATIVE wedge_arm_70
 ROTATED (0,0,0) RELATIVE wedge_arm_70
 
-COMPONENT det_0_outer_2_4_7 = Union_cylinder(
- material_string = "Al", priority = 70.11,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_close_He3_2_4_7 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_7_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_7
 ROTATED (0,0,90) RELATIVE det_arm_2_4_7
 
-COMPONENT det_0_He3_2_4_7 = Union_cylinder(
- material_string = "He3", priority = 70.12,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_7
-ROTATED (0,0,90) RELATIVE det_arm_2_4_7
-
-COMPONENT signal_tof_1Dspace_02_4_7 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_2_4_7", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_7_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_2_4_7
-
-COMPONENT det_1_outer_2_4_7 = Union_cylinder(
- material_string = "Al", priority = 70.14,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_mid_He3_2_4_7 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_7_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_2_4_7
 ROTATED (0,0,90) RELATIVE det_arm_2_4_7
 
-COMPONENT det_1_He3_2_4_7 = Union_cylinder(
- material_string = "He3", priority = 70.15,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_7
-ROTATED (0,0,90) RELATIVE det_arm_2_4_7
-
-COMPONENT signal_tof_1Dspace_1_2_4_7 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_2_4_7", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_7_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_2_4_7
-
-COMPONENT det_2_outer_2_4_7 = Union_cylinder(
- material_string = "Al", priority = 70.17,
- radius = 0.0127, yheight = 0.3248)
+COMPONENT det_far_He3_2_4_7 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3048,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_7_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_2_4_7
 ROTATED (0,0,90) RELATIVE det_arm_2_4_7
-
-COMPONENT det_2_He3_2_4_7 = Union_cylinder(
- material_string = "He3", priority = 70.18,
- radius = 0.0117, yheight = 0.3048)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_2_4_7
-ROTATED (0,0,90) RELATIVE det_arm_2_4_7
-
-COMPONENT signal_tof_1Dspace_2_2_4_7 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_2_4_7", yheight = 0.3048,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_7_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_2_4_7
 
 COMPONENT wedge_arm_80 = Arm()
 AT (0,0,0) RELATIVE A4_rot
@@ -1186,135 +825,90 @@ COMPONENT ana_arm_3_4_8 = Arm()
 AT (0,0,1.701) RELATIVE wedge_arm_80
 ROTATED (0,0,0) RELATIVE wedge_arm_80
 
-COMPONENT PG_piece_3_4_0_8 = Union_box(
- material_string = "PG_crystal", priority = 80.1,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_0_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.038165,-0.051087) RELATIVE ana_arm_3_4_8
-ROTATED (-54.254,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-54.254,90,0) RELATIVE ana_arm_3_4_8
 
-COMPONENT PG_piece_3_4_1_8 = Union_box(
- material_string = "PG_crystal", priority = 80.2,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_1_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.028846,-0.038149999999999996) RELATIVE ana_arm_3_4_8
-ROTATED (-53.923,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-53.923,90,0) RELATIVE ana_arm_3_4_8
 
-COMPONENT PG_piece_3_4_2_8 = Union_box(
- material_string = "PG_crystal", priority = 80.3,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_2_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.019378,-0.025323000000000002) RELATIVE ana_arm_3_4_8
-ROTATED (-53.591,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-53.591,90,0) RELATIVE ana_arm_3_4_8
 
-COMPONENT PG_piece_3_4_3_8 = Union_box(
- material_string = "PG_crystal", priority = 80.4,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_3_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.009762,-0.012605) RELATIVE ana_arm_3_4_8
-ROTATED (-53.26,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-53.26,90,0) RELATIVE ana_arm_3_4_8
 
-COMPONENT PG_piece_3_4_4_8 = Union_box(
- material_string = "PG_crystal", priority = 80.5,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_4_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,0.0,0.0) RELATIVE ana_arm_3_4_8
-ROTATED (-52.928,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-52.928,90,0) RELATIVE ana_arm_3_4_8
 
-COMPONENT PG_piece_3_4_5_8 = Union_box(
- material_string = "PG_crystal", priority = 80.6,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_5_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.009907000000000001,0.012492000000000001) RELATIVE ana_arm_3_4_8
-ROTATED (-52.597,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-52.597,90,0) RELATIVE ana_arm_3_4_8
 
-COMPONENT PG_piece_3_4_6_8 = Union_box(
- material_string = "PG_crystal", priority = 80.7,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_6_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.019958,0.024867999999999998) RELATIVE ana_arm_3_4_8
-ROTATED (-52.265,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-52.265,90,0) RELATIVE ana_arm_3_4_8
 
-COMPONENT PG_piece_3_4_7_8 = Union_box(
- material_string = "PG_crystal", priority = 80.8,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_7_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.030152,0.037127) RELATIVE ana_arm_3_4_8
-ROTATED (-51.934,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-51.934,90,0) RELATIVE ana_arm_3_4_8
 
-COMPONENT PG_piece_3_4_8_8 = Union_box(
- material_string = "PG_crystal", priority = 80.9,
- xwidth = 0.1886, yheight = 0.014,
- zdepth = 0.001)
+COMPONENT PG_piece_3_4_8_8 = Monochromator_flat(
+ zwidth = 0.1886, yheight = 0.014,
+ mosaich = 50, mosaicv = 50,
+ DM = 3.355)
 AT (0,-0.040487,0.049267000000000005) RELATIVE ana_arm_3_4_8
-ROTATED (-51.603,0,0) RELATIVE ana_arm_3_4_8
+ROTATED (-51.603,90,0) RELATIVE ana_arm_3_4_8
 
 COMPONENT det_arm_3_4_8 = Arm()
 AT (0,-1.5612402,2.1444613) RELATIVE wedge_arm_80
 ROTATED (0,0,0) RELATIVE wedge_arm_80
 
-COMPONENT det_0_outer_3_4_8 = Union_cylinder(
- material_string = "Al", priority = 80.11,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_close_He3_3_4_8 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_8_4_0.dat")
 AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_8
 ROTATED (0,0,90) RELATIVE det_arm_3_4_8
 
-COMPONENT det_0_He3_3_4_8 = Union_cylinder(
- material_string = "He3", priority = 80.12,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_8
-ROTATED (0,0,90) RELATIVE det_arm_3_4_8
-
-COMPONENT signal_tof_1Dspace_03_4_8 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_0_He3_3_4_8", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_8_4_0.dat")
-AT (0,0,0) RELATIVE det_0_He3_3_4_8
-
-COMPONENT det_1_outer_3_4_8 = Union_cylinder(
- material_string = "Al", priority = 80.14,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_mid_He3_3_4_8 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_8_4_1.dat")
 AT (0,0,0) RELATIVE det_arm_3_4_8
 ROTATED (0,0,90) RELATIVE det_arm_3_4_8
 
-COMPONENT det_1_He3_3_4_8 = Union_cylinder(
- material_string = "He3", priority = 80.15,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_8
-ROTATED (0,0,90) RELATIVE det_arm_3_4_8
-
-COMPONENT signal_tof_1Dspace_1_3_4_8 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_1_He3_3_4_8", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_8_4_1.dat")
-AT (0,0,0) RELATIVE det_1_He3_3_4_8
-
-COMPONENT det_2_outer_3_4_8 = Union_cylinder(
- material_string = "Al", priority = 80.17,
- radius = 0.0127, yheight = 0.3319)
+COMPONENT det_far_He3_3_4_8 = Monitor_nD(
+ xwidth = 0.0254, yheight = 0.3119,
+ options = "cylinder, y, bins=100, t, limits=[0.05 0.3], bins=1000]", filename = "signal_1Dspace_8_4_2.dat")
 AT (0,0.006194980859273648,0.0264) RELATIVE det_arm_3_4_8
 ROTATED (0,0,90) RELATIVE det_arm_3_4_8
-
-COMPONENT det_2_He3_3_4_8 = Union_cylinder(
- material_string = "He3", priority = 80.18,
- radius = 0.0117, yheight = 0.3119)
-AT (0,-0.006194980859273648,-0.0264) RELATIVE det_arm_3_4_8
-ROTATED (0,0,90) RELATIVE det_arm_3_4_8
-
-COMPONENT signal_tof_1Dspace_2_3_4_8 = Union_abs_logger_1D_space_tof(
- target_geometry = "det_2_He3_3_4_8", yheight = 0.3119,
- n = 100, time_min = 0.05,
- time_max = 0.3, time_bins = 1000,
- filename = "signal_1Dspace_8_4_2.dat")
-AT (0,0,0) RELATIVE det_2_He3_3_4_8
-
-COMPONENT master = Union_master()
-AT (0,0,0) ABSOLUTE
-
-COMPONENT stop = Union_stop()
-AT (0,0,0) ABSOLUTE
 
 FINALLY 
 %{

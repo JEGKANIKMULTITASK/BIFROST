@@ -18,4 +18,5 @@ Bifrost*/
 scan*
 *.mcpl
 MCPL_*
+*data*
 #!**/*Bifrost*

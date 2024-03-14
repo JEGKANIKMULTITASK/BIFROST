@@ -1,7 +1,8 @@
 import numpy as np
 import h5py
 import pandas as pd
-
+import warnings
+import os
 
 back_info = pd.read_csv('../BIFROST_Design_Article/Energy_resolution/BIFROST_McStas_backend_information.csv')
 #back_info = back_info.loc[back_info['wedge_number'] == 1]
@@ -86,9 +87,9 @@ class tube_measurement:
             
     def getMcStasData(self, filename):
         """
-        Loading all relevant data from McStas simulation NeXus file.
+        Loading all relevant data from McStas simulation mccode file.
 
-        Takes: string with file path to relevant .h5 file
+        Takes: string with file path to relevant folder
 
         **returns**
         Attributes for: 
@@ -110,7 +111,7 @@ class tube_measurement:
 
         with open(file, 'r') as the_file:
             all_data = [line.strip() for line in the_file.readlines()]
-            limits = all_data[28]
+            limits = all_data[29]
             limits = limits.replace('# xylimits: ', '')
             limits = limits.split(' ')
             limits = np.asarray(limits, dtype=float)
@@ -268,26 +269,40 @@ class tube_measurement:
 
         return I, I_err, DeltaE, qx, qy
     
-    def load_scan(keyword, output_filename, reduce_zero=False):
-
-    # Search for files containing the keyword in the filename
+    def load_scan(keyword, output_filename, reduce_zero=False, set_Elim=False, mcgui=False, cor=False):
+        """
+        
+        """
+        # Search for files containing the keyword in the filename
         files_with_keyword = [file for file in os.listdir() if keyword in file]
 
         if not files_with_keyword:
             print("No files found with the specified keyword.")
             return
         
+        # If simulation is from mcgui, then the files_with_keyword should be found in folders
+        if mcgui == True:
+            files_with_keyword = [os.path.join(keyword, name) for name in os.listdir(keyword) if os.path.isdir(os.path.join(keyword, name))]
+
+        # 
         with open(output_filename, 'a') as output_file:
             for file_with_keyword in files_with_keyword:
                 
                 # Load information from the file
-                processed_data = tube_measurement.load_Backend_measurment(file_with_keyword)
+                processed_data = tube_measurement.load_Backend_measurment(file_with_keyword, Correct=cor)
                 
                 # Convert tuple of results to nd.array
                 matrix = np.column_stack(processed_data)
 
                 # Reduce all datapoints where I = 0
+                if reduce_zero == True:
+                    matrix = matrix[matrix[:,0]>0]
                 
+                # Choose the upper and lower energy bound saved to txt file.
+                if set_Elim != False:
+                    if set_Elim[0]>set_Elim[1]:
+                        warnings.warn("Lower bound is greater than upper bound. Change order of numbers.", category=Warning)
+                    matrix = matrix[(matrix[:,2]>=set_Elim[0]) & (matrix[:,2]<=set_Elim[1])]
 
                 # Append processed data to output file
                 np.savetxt(output_file, matrix, delimiter='\t', fmt='%f')
