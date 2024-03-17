@@ -18,7 +18,7 @@ back_info = np.asarray(back_info, dtype=float)
 back_info = back_info[(back_info[:,0]== 2.7)  & (back_info[:,2]== 4) | (back_info[:,0]== 3.2) & (back_info[:,2]== 4)| (back_info[:,0]== 3.8) & (back_info[:,2]== 5) | (back_info[:,0]== 4.4) & (back_info[:,2]== 5) | (back_info[:,0]== 5.0) & (back_info[:,2]== 5)]
 
 
-class tube_measurement:
+class BIFROST_measurement:
     """
     This Object is designed to contain 1 tube mearsurment, in a given (A3, A4) setting,  including data and metadata needed for further reduction. To this object the following information can be assosiated:
 
@@ -111,7 +111,7 @@ class tube_measurement:
 
         with open(file, 'r') as the_file:
             all_data = [line.strip() for line in the_file.readlines()]
-            limits = all_data[29]
+            limits = all_data[28]
             limits = limits.replace('# xylimits: ', '')
             limits = limits.split(' ')
             limits = np.asarray(limits, dtype=float)
@@ -159,7 +159,7 @@ class tube_measurement:
         t_offset_optimal = 6940.56*1e-6
         t = self.t_s - t_offset_optimal # time measured in [s] has shape (N time bins)
         Ef_J = self.Ef*1.602176634e-22 # [J]
-        Li = (162-6.35)# +3.14 # [m] # AHHHH!!! OFFSET NEEDED TO GET RIGHT DELTA E!!!!
+        Li = (162-6.35)# [m]
         m_n = 1.67492749804e-27 # [kg]
 
         # calculate Delta E for all points I
@@ -245,7 +245,7 @@ class tube_measurement:
 
         for w in range(9):
             for t in range(3):
-                obj = tube_measurement(wedge=w, arc=4, tube=t)
+                obj = BIFROST_measurement(wedge=w, arc=4, tube=t)
 
                 obj.getMcStasData(filepath)
                 obj.calcDE()
@@ -290,7 +290,7 @@ class tube_measurement:
             for file_with_keyword in files_with_keyword:
                 
                 # Load information from the file
-                processed_data = tube_measurement.load_Backend_measurment(file_with_keyword, Correct=cor)
+                processed_data = BIFROST_measurement.load_Backend_measurment(file_with_keyword, Correct=cor)
                 
                 # Convert tuple of results to nd.array
                 matrix = np.column_stack(processed_data)
