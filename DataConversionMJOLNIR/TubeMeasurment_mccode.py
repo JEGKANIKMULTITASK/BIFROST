@@ -197,8 +197,15 @@ class BIFROST_measurement:
         qx = ki-kf*np.cos(np.radians(A4))
         qy = -kf*np.sin(np.radians(A4))
 
-        self.Q = np.stack((qx,qy))
+        Q = np.stack((qx,qy)).reshape(2,-1)
 
+        # Convert A3 to radians
+        A3 = np.radians(self.A3)
+
+        # Define the Sample rotation matrix
+        Rot_matrix = np.array([[np.cos(A3), -np.sin(A3)],[np.sin(A3), np.cos(A3)]])
+
+        self.Q = np.dot(Rot_matrix, Q)
         return self.Q
 
     def flatten(self):
@@ -245,7 +252,7 @@ class BIFROST_measurement:
 
         for w in range(9):
             for t in range(3):
-                obj = BIFROST_measurement(wedge=w, arc=4, tube=t)
+                obj = BIFROST_measurement(wedge=w, arc=0, tube=1)
 
                 obj.getMcStasData(filepath)
                 obj.calcDE()
