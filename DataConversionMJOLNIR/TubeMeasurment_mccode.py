@@ -3,6 +3,7 @@ import h5py
 import pandas as pd
 import warnings
 import os
+import pickle
 
 back_info = pd.read_csv('../BIFROST_Design_Article/Energy_resolution/BIFROST_McStas_backend_information.csv')
 #back_info = back_info.loc[back_info['wedge_number'] == 1]
@@ -136,7 +137,8 @@ class BIFROST_measurement:
         self.dA4 = np.degrees(np.arctan((self.y_m/self.L_sd)))
         
         # Add the offset for tank and wedge number
-        self.A4 = A4_offset + wedge_offset + self.dA4
+        A4 = (A4_offset + wedge_offset + self.dA4)*-1
+        self.A4 = np.flip(A4)
 
         return self.I, self.I_err, self.t_s, self.y_m, self.A3, self.A4, self.dA4
 
@@ -238,7 +240,19 @@ class BIFROST_measurement:
         return self.I
 
 
-    def load_Backend_measurment(filepath, Correct=False):
+    def Normalize(self):
+        """
+        Should take the tube data and normalize to the integrated intensity in each pixel.
+        """
+        with open("vana_norm.pkl", "rb") as file:
+            loaded_obj = pickle.load(file)
+        
+
+
+        return 1
+
+
+    def load_Backend_measurment(filepath, Correct=False, Norm_data=False):
         """
         
         """
@@ -252,22 +266,27 @@ class BIFROST_measurement:
 
         for w in range(9):
             for t in range(3):
-                obj = BIFROST_measurement(wedge=w, arc=0, tube=1)
+                obj = BIFROST_measurement(wedge=w, arc=4, tube=1)
 
                 obj.getMcStasData(filepath)
                 obj.calcDE()
                 obj.calcQ()
                 if Correct==True:
                     obj.CorrectI()
-                obj.flatten()
-
-                I.append(obj.I)
-                I_err.append(obj.I_err)
-                DeltaE.append(obj.Delta_E)
-                qx.append(obj.Q[0])
-                qy.append(obj.Q[1])
+                
+                if Norm_data==False:
+                    obj.flatten()
+                    I.append(obj.I)
+                    I_err.append(obj.I_err)
+                    DeltaE.append(obj.Delta_E)
+                    qx.append(obj.Q[0])
+                    qy.append(obj.Q[1])
 
                 setting['TM_'+str(w)+'_4_'+str(t)] = obj
+        
+        if Norm_data==True:
+            with open("vana_norm.pkl", "wb") as file:
+                pickle.dump(setting, file)
 
         I = np.asarray(I).flatten()
         I_err = np.asarray(I_err).flatten()
@@ -277,7 +296,7 @@ class BIFROST_measurement:
 
         return I, I_err, DeltaE, qx, qy
     
-    def load_scan(keyword, output_filename, reduce_zero=False, set_Elim=False, mcgui=False, cor=False):
+    def load_scan(keyword, output_filename, reduce_zero=False, set_Elim=False, mcgui=False, Correct=False, Norm_data=False):
         """
         
         """
@@ -297,7 +316,7 @@ class BIFROST_measurement:
             for file_with_keyword in files_with_keyword:
                 
                 # Load information from the file
-                processed_data = BIFROST_measurement.load_Backend_measurment(file_with_keyword, Correct=cor)
+                processed_data = BIFROST_measurement.load_Backend_measurment(file_with_keyword, Correct=Correct, Norm_data=Norm_data)
                 
                 # Convert tuple of results to nd.array
                 matrix = np.column_stack(processed_data)
@@ -315,3 +334,5 @@ class BIFROST_measurement:
                 # Append processed data to output file
                 np.savetxt(output_file, matrix, delimiter='\t', fmt='%f')
                 output_file.write('\n')
+
+    
