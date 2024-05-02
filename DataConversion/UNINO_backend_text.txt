@@ -1,0 +1,132 @@
+""" UNION processes """
+
+init = bi_end.add_component("init", "Union_init") # This component has to be called init
+
+################################### Aluminium #############################
+
+Al_inc = bi_end.add_component("Al_inc", "Incoherent_process")
+Al_inc.sigma = 4*0.0082 # 4 atoms per unit cell
+Al_inc.unit_cell_volume = 66.4
+
+Al_pow = bi_end.add_component("Al_pow", "Powder_process")
+Al_pow.reflections = '"Al.laz"'
+
+Al = bi_end.add_component("Al", "Union_make_material")
+Al.process_string = '"Al_inc,Al_pow"'
+Al.my_absorption = 100*4*0.231/66.4 # barns [m^2 E-28]*Å^3 [m^3 E-30]=[m E-2]
+
+##################################### PG ##################################
+
+PG_crystal = add_ncrystal_union_material(bi_end, "PG_crystal" ,cfgstr="C_sg194_pyrolytic_graphite.ncmat;mos=50arcmin;dir1=@crys_hkl:0,0,2@lab:0,0,1;dir2=@crys_hkl:9,9,9@lab:9,9,9;dirtol=180deg;temp=25C", split=True)
+
+##################################### HE3 ##################################
+
+"""
+All of the He3 calculations in this section is from Mads Bertelsen and the QENS exercise from the DMSC school 2023 wich i attended.
+"""
+
+def mu_gas(sigma, bars, temperature_C):
+        pressure_Pa = bars * 1e5
+        number_density_mol_per_m3 = pressure_Pa / (8.3145 * (temperature_C + 273.15))
+        number_density_per_m3 = number_density_mol_per_m3 * 6.022e23
+        number_density_per_A3 = number_density_per_m3 / 1e30
+        return sigma * number_density_per_A3 * 100
+
+He3_pressure_bars = 3
+He3_temperature_C = 25
+
+He3_inc = bi_end.add_component("He3_inc", "Incoherent_process")
+He3_inc.sigma = mu_gas(1.6, bars=He3_pressure_bars, temperature_C=He3_temperature_C)
+He3_inc.unit_cell_volume = 100
+
+He3 = bi_end.add_component("He3", "Union_make_material")
+He3.process_string = '"He3_inc"'
+He3.my_absorption = mu_gas(5333, bars=He3_pressure_bars, temperature_C=He3_temperature_C)
+#He3.absorber = 1
+
+""" UNION backend components """
+
+def make_backend_set(wedge_num, energy, energy_string, priority_offset, ang_offset, wedge_name):
+    wedge_info = ana[ana["wedge_number"] == wedge_num]
+    ana_en_info = wedge_info[wedge_info["Energy"] == energy]
+    arm_info = np.squeeze(ana_en_info[ana_en_info["Blade_number"] == 1].to_numpy())
+
+    wedge_info_det = det[det["Wedge number"] == wedge_num]
+    det_info = np.squeeze(wedge_info_det[wedge_info_det["Energy"] == energy].to_numpy())
+    
+    
+    ana_arm = bi_end.add_component("ana_arm_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Arm", AT=[0, 0, arm_info[3]], ROTATED=[0, 0, 0], RELATIVE="wedge_arm"+"_"+str(ang_offset))
+    
+    for i in range(len(ana_en_info)):
+        info = np.squeeze(ana_en_info[ana_en_info["Blade_number"] == i+1].to_numpy())
+        
+        crystal_name = "PG_piece_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(i)+"_"+str(wedge_name)
+
+        #PG_piece = bi_end.add_component(crystal_name,"Monochromator_flat", AT=[0, info[8]/1000, info[7]/1000], ROTATED=[-(90-info[9]), 90, 0], RELATIVE=ana_arm)
+        #PG_piece.set_parameters(zwidth=info[5], yheight=info[6], DM=3.355, mosaich=50, mosaicv=50)
+        PG_piece = bi_end.add_component(crystal_name, "Union_box", AT=[0, info[8]/1000, info[7]/1000], ROTATED=[-(90-info[9]), 0, 0], RELATIVE=ana_arm)
+        PG_piece.set_parameters(xwidth=info[5], yheight=info[6], zdepth=0.001, priority=priority_offset+(i+1)/10, material_string='"PG_crystal"')
+
+        
+    ########################################### Making the detector section #########################################
+    
+    det_arm = bi_end.add_component(
+        "det_arm_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Arm",
+        AT=[0, det_info[3], det_info[2]], ROTATED=[0, 0, 0], RELATIVE="wedge_arm"+"_"+str(ang_offset))
+
+
+    det_0_outer = bi_end.add_component("det_0_outer_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_cylinder", AT=[0, np.tan(np.radians(2*info[9]-90))*(2*0.0127+0.001), -(2*0.0127+0.001)], ROTATED=[0,0,90], RELATIVE="det_arm_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    det_0_outer.set_parameters(yheight=det_info[4]+0.02, radius=0.0127, priority=priority_offset+0.11, material_string='"Al"')
+    
+    det_0_He3 = bi_end.add_component("det_0_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_cylinder", AT=[0, np.tan(np.radians(2*info[9]-90))*(2*0.0127+0.001), -(2*0.0127+0.001)], ROTATED=[0,0,90], RELATIVE="det_arm_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    det_0_He3.set_parameters(yheight=det_info[4], radius=0.0127-0.001, priority=priority_offset+0.12, material_string='"He3"')
+
+    detector_space_0 = bi_end.add_component("signal_tof_1Dspace_0"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_abs_logger_1D_space_tof", RELATIVE="det_0_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    detector_space_0.target_geometry = '"'+"det_0_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name)+'"'
+    detector_space_0.yheight = det_info[4]#(0.0127-0.001)*2
+    detector_space_0.n = 100
+    detector_space_0.time_min = 0.05 # 
+    detector_space_0.time_max = 0.3 # 
+    detector_space_0.time_bins = 1000 # Optimized after having 25 µs time bin resolution
+    detector_space_0.filename = '"'+"signal_1Dspace_"+str(wedge_name)+"_"+str(energy_string)+"_0.dat"+'"'
+    
+
+    
+    det_1_outer = bi_end.add_component("det_1_outer_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_cylinder", AT=[0, 0, 0], ROTATED=[0,0,90], RELATIVE="det_arm_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    det_1_outer.set_parameters(yheight=det_info[4]+0.02, radius=0.0127, priority=priority_offset+0.14, material_string='"Al"')
+    
+    det_1_He3 = bi_end.add_component("det_1_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_cylinder", AT=[0, np.tan(np.radians(2*info[9]-90))*(2*0.0127+0.001), -(2*0.0127+0.001)], ROTATED=[0,0,90], RELATIVE="det_arm_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    det_1_He3.set_parameters(yheight=det_info[4], radius=0.0127-0.001, priority=priority_offset+0.15, material_string='"He3"')
+    
+    detector_space_1 = bi_end.add_component("signal_tof_1Dspace_1_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_abs_logger_1D_space_tof", RELATIVE="det_1_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    detector_space_1.target_geometry = '"'+"det_1_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name)+'"'
+    detector_space_1.yheight = det_info[4]#(0.0127-0.001)*2
+    detector_space_1.n = 100
+    detector_space_1.time_min = 0.05 # 
+    detector_space_1.time_max = 0.3 # 
+    detector_space_1.time_bins = 1000 # Optimized after having 25 µs time bin resolution
+    detector_space_1.filename = '"'+"signal_1Dspace_"+str(wedge_name)+"_"+str(energy_string)+"_1.dat"+'"'
+   
+    
+    det_2_outer = bi_end.add_component("det_2_outer_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_cylinder", AT=[0,-np.tan(np.radians(2*info[9]-90))*(2*0.0127+0.001), (2*0.0127+0.001)], ROTATED=[0,0,90], RELATIVE="det_arm_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    det_2_outer.set_parameters(yheight=det_info[4]+0.02, radius=0.0127, priority=priority_offset+0.17, material_string='"Al"')
+
+    det_2_He3 = bi_end.add_component("det_2_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_cylinder", AT=[0, np.tan(np.radians(2*info[9]-90))*(2*0.0127+0.001), -(2*0.0127+0.001)], ROTATED=[0,0,90], RELATIVE="det_arm_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    det_2_He3.set_parameters(yheight=det_info[4], radius=0.0127-0.001, priority=priority_offset+0.18, material_string='"He3"')
+    
+    detector_space_2 = bi_end.add_component("signal_tof_1Dspace_2_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name), "Union_abs_logger_1D_space_tof", RELATIVE="det_2_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    detector_space_2.target_geometry = '"'+"det_2_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name)+'"'
+    detector_space_2.yheight = det_info[4]#(0.0127-0.001)*2
+    detector_space_2.n = 100
+    detector_space_2.time_min = 0.05 # 
+    detector_space_2.time_max = 0.3 # 
+    detector_space_2.time_bins = 1000 # Optimized after having 25 µs time bin resolution
+    detector_space_2.filename = '"'+"signal_1Dspace_"+str(wedge_name)+"_"+str(energy_string)+"_2.dat"+'"'
+
+
+    #Detector_names.append("det_0_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    #Detector_names.append("det_1_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+    #Detector_names.append("det_2_He3_"+str(wedge_num)+"_"+str(energy_string)+"_"+str(wedge_name))
+
+
+#print(make_backend_set(1,5.0,"5p0",5,0))

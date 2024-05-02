@@ -17,7 +17,9 @@ Cluster*
 Bifrost*/
 scan*
 *.mcpl
+vana*
+*_data_*
+*data
 MCPL_*
-*data*
-Phonon_Pb_v*
-#!**/*Bifrost*
+Phonon_Pb*
+#!**/Reduction*
