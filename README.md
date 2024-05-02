@@ -4,9 +4,7 @@
 
 This repository contains the work of the BIFROST McStas model. However, no simulation data is included as files are to big, but will be sent on reasonable request. 
 
-<p align="center">
 ![Pb Phonon dispersion](https://github.com/NBI-Magnetism-Group/BIFROST/blob/main/Pb_Phonon_GIF_Nice.gif)
-</p>
 
  **NOTE**: Since I am using VScode as my editor, I have developed a slightly bad happit by being able to choose the environment for each individual notebook. Therefore multible are needed to make the scripts run. 
 
