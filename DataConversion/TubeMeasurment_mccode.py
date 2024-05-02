@@ -236,7 +236,7 @@ class BIFROST_measurement:
         # Reshape A4 to have A4 for each matrix
         de_dt = np.tile(de_dt, (len(self.I[:,0]),1))
         self.I = self.I/de_dt
-        self.I_err = self.I_err/de_dt
+        
         return self.I
 
 
