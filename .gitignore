@@ -2,7 +2,7 @@
 *.dat
 *.out
 *.sim
-*.DS_store
+*.DS_Store
 *.stdout
 *.c
 *.stderr
@@ -22,4 +22,6 @@ vana*
 *data
 MCPL_*
 Phonon_Pb*
-#!**/Reduction*
+!*.png
+!*.pdf
+lass*
