@@ -27,7 +27,8 @@ Primary content:
 
 **Energy resolution**: 
     - **Inelastic_line_resolution.ipynb**: Datatreatment to determine the energy resolution at different energy transfers and PSC settings. Also performs the calculatations for theoretical predictions and compare to the simulated data. This script makes the figure:
-    ![FWHM overview]()
+
+![FWHM overview](https://github.com/NBI-Magnetism-Group/BIFROST/blob/main/BIFROST_Design_Article/Energy_resolution/Inelastic_Energy_resolution_Article_limits.png)
 
 ### DataConversion: 
 The dataconversion scripts that are using scipp. The plan is to make a reduction that MJOLNIR can read (Qx, Qy, I, Ierr. Example given from Jakob in lassIN5Conversion.py). To run notebook the Env_with_KGS.yml should be used as I have my own libary on a daily basis. 
