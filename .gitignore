@@ -14,7 +14,7 @@ backend_mockup_*
 Cluster*
 *test*
 *Ef_res*
-Bifrost*/
+*Bifrost*
 scan*
 *.mcpl
 vana*
@@ -23,5 +23,6 @@ vana*
 MCPL_*
 Phonon_Pb*
 !*.png
+!*Design*
 !*.pdf
 lass*

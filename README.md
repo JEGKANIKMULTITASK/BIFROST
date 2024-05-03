@@ -20,7 +20,14 @@ Files provided from Rasmus Toft-Petersen of analyzer the BIFOST backend geometry
 Code used for the BIFROST design article. Includes energy resolution and brilliance transfer simulations, as well as guide drawing for the article.
  
 Primary content: 
-- Brilliance_flux
+
+**Brilliance_flux**: Intrument file and python script to analyse the flux of BIFROSt at sample position (Made for design article and is not a part of MSc thesis).
+
+**Guide_drawing**: Python script to construct comprehensive figure of the BIFROST guide with colors indicating the m-valus coating. Also have txt file of the placements of all the McStas components in the primary spectrometer. Used as a base line for the figure.
+
+**Energy resolution**: 
+    - **Inelastic_line_resolution.ipynb**: Datatreatment to determine the energy resolution at different energy transfers and PSC settings. Also performs the calculatations for theoretical predictions and compare to the simulated data. This script makes the figure:
+    ![FWHM overview]()
 
 ### DataConversion: 
 The dataconversion scripts that are using scipp. The plan is to make a reduction that MJOLNIR can read (Qx, Qy, I, Ierr. Example given from Jakob in lassIN5Conversion.py). To run notebook the Env_with_KGS.yml should be used as I have my own libary on a daily basis. 
