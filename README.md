@@ -1,23 +1,40 @@
-# Github repo for the McStas version of BIFROST
+# Github repo for the McStas simulations of BIFROST
 
- By: Kristine M. L. Krighaar 
+*By: Kristine M. L. Krighaar* 
 
-This repository contains the work of the BIFROST McStas model. However, no simulation data is included as files are to big, but will be sent on reasonable request. 
+This repository contains the work of the BIFROST McStas model. However, no simulation data is included as files are to big, but can be provided upon reasonable reasonable request. 
 
-![Pb Phonon dispersion](https://github.com/NBI-Magnetism-Group/BIFROST/blob/main/Pb_Phonon_GIF_Nice.gif)
+![Pb Phonon dispersion](https://github.com/NBI-Magnetism-Group/BIFROST/blob/main/Phonon_GIF2.gif)
 
- **NOTE**: Since I am using VScode as my editor, I have developed a slightly bad happit by being able to choose the environment for each individual notebook. Therefore multible are needed to make the scripts run. 
+**NOTE**: Since I am using VScode as my editor, I have developed a slightly bad happit by being able to choose the environment for each individual notebook. Therefore multible are needed to make the scripts run. 
 
- Backend written in McStasScript and datareduction is made using Scipp. 
+Backend written in McStasScript and datareduction is made using scipp and python. 
  
- ## Description of folders:
+## Description of folders:
  
- - Analyzer_positions: Files provided from Rasmus Toft-Petersen of analyzer positions.
+### Analyzer_positions: 
+Files provided from Rasmus Toft-Petersen of analyzer the BIFOST backend geometry.
  
- - BIFROST_Design_Article: Code used for the BIFROST design article. Includes energy resolution and brilliance transfer simulations, as well as guide drawing for the article. 
+### BIFROST_Design_Article: 
+ 
+Code used for the BIFROST design article. Includes energy resolution and brilliance transfer simulations, as well as guide drawing for the article.
+ 
+Primary content: 
+- Brilliance_flux
 
- - DataConversionMJOLNIR: The dataconversion scripts that are using scipp. The plan is to make a reduction that MJOLNIR can read (Qx, Qy, I, Ierr. Example given from Jakob in lassIN5Conversion.py). To run notebook the Env_with_KGS.yml should be used as I have my own libary on a daily basis. 
+### DataConversion: 
+The dataconversion scripts that are using scipp. The plan is to make a reduction that MJOLNIR can read (Qx, Qy, I, Ierr. Example given from Jakob in lassIN5Conversion.py). To run notebook the Env_with_KGS.yml should be used as I have my own libary on a daily basis. 
  
- - McStasScript: Code to make a mcstas simulation of the backend of BIFROST. Primary Notebook here is BIFROST_UNION_Backend.ipynb. Currently also includes notes from Rasmus on datareduction, .csv files of the  analyzer and detector information for an easy import.  
+### McStasScript: 
+Code used to make a mcstas simulation of the backend of BIFROST. 
 
- Hope the Env_with_KGS.yml works with KGS (Kristines Golden Standard), if not, please let me know. 
+Primary content: 
+- **BIFROST_UNION_Backend.ipynb**: The McStasScript code used to generate intrument files in wanted configurations. Instrument files are saved in the *run_folder* and the simulation results are saved in the *data_folder*.
+
+- **backend_information_Analyzer_information.csv**: Information about the analysers geometry formated into a easily readable .csv format.
+
+- **backend_information_Detector_information.csv**: Information about the detector geometry formated into a easily readable .csv format.
+ 
+  
+
+Hope the Env_with_KGS.yml works with KGS (Kristines Golden Standard), if not, please let me know. 
